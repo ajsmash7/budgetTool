@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="BankGUI">
+  <grid id="27dc6" binding="MainPanel" layout-manager="GridLayoutManager" row-count="19" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="1">
+    <margin top="10" left="10" bottom="10" right="10"/>
+    <constraints>
+      <xy x="20" y="20" width="925" height="662"/>
+    </constraints>
+    <properties>
+      <background color="-5657687"/>
+    </properties>
+    <border type="line" title="Money Manager" title-justification="3" title-position="1">
+      <font name="Arial Black" size="28" style="3"/>
+      <title-color color="-14049760"/>
+      <color color="-14049760"/>
+    </border>
+    <children>
+      <component id="ad186" class="javax.swing.JTextField" binding="date_field">
+        <constraints>
+          <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="25"/>
+            <preferred-size width="150" height="25"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="c670b" class="javax.swing.JComboBox" binding="typeSelector">
+        <constraints>
+          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="300" height="25"/>
+            <preferred-size width="300" height="25"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font name="Arial" size="11" style="1"/>
+          <model>
+            <item value="CHOOSE ONE FROM THE LIST"/>
+            <item value="DEPOSIT"/>
+            <item value="BILL"/>
+            <item value="EXPENSE"/>
+          </model>
+        </properties>
+      </component>
+      <component id="7ecde" class="javax.swing.JTextField" binding="amount">
+        <constraints>
+          <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="100" height="25"/>
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="2a341" class="javax.swing.JTextField" binding="desc_name">
+        <constraints>
+          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="300" height="25"/>
+            <preferred-size width="300" height="25"/>
+          </grid>
+        </constraints>
+        <properties>
+          <text value="Enter Description Name"/>
+        </properties>
+      </component>
+      <hspacer id="533d8">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="6" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="5"/>
+            <preferred-size width="-1" height="5"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <hspacer id="eceee">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="6" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="5"/>
+            <preferred-size width="-1" height="5"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <hspacer id="6abbb">
+        <constraints>
+          <grid row="5" column="0" row-span="1" col-span="6" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="5"/>
+            <preferred-size width="-1" height="5"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <hspacer id="ba9de">
+        <constraints>
+          <grid row="7" column="0" row-span="1" col-span="6" vsize-policy="1" hsize-policy="7" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="600" height="10"/>
+            <preferred-size width="600" height="10"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <component id="6722f" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="10" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="14" style="1"/>
+          <foreground color="-14049760"/>
+          <horizontalAlignment value="2"/>
+          <horizontalTextPosition value="2"/>
+          <text value="Funds After Bills"/>
+          <verticalAlignment value="1"/>
+          <verticalTextPosition value="1"/>
+        </properties>
+      </component>
+      <component id="6c083" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="14" style="1"/>
+          <foreground color="-14049760"/>
+          <horizontalAlignment value="2"/>
+          <horizontalTextPosition value="2"/>
+          <text value="Real Funds"/>
+          <verticalAlignment value="1"/>
+          <verticalTextPosition value="1"/>
+        </properties>
+      </component>
+      <component id="45909" class="javax.swing.JLabel" binding="after_billpay">
+        <constraints>
+          <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="6" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="75" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <alignmentX value="0.5"/>
+          <font name="Arial Black" size="18" style="3"/>
+          <foreground color="-14049760"/>
+          <horizontalAlignment value="2"/>
+          <horizontalTextPosition value="2"/>
+          <text value="$0.00"/>
+          <verticalAlignment value="1"/>
+          <verticalTextPosition value="1"/>
+        </properties>
+      </component>
+      <component id="15803" class="javax.swing.JLabel" binding="available_cash">
+        <constraints>
+          <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="5" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="75" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <alignmentX value="0.5"/>
+          <font name="Arial Black" size="18" style="3"/>
+          <foreground color="-14049760"/>
+          <horizontalAlignment value="2"/>
+          <horizontalTextPosition value="2"/>
+          <inheritsPopupMenu value="false"/>
+          <text value="$0.00"/>
+          <verticalAlignment value="0"/>
+        </properties>
+      </component>
+      <scrollpane id="825ec" binding="billPane">
+        <constraints>
+          <grid row="14" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="300" height="150"/>
+            <preferred-size width="300" height="150"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="line" title="Current Bills" title-justification="1" title-position="1">
+          <font name="Arial" size="16" style="1"/>
+          <title-color color="-6086888"/>
+          <color color="-6086888"/>
+        </border>
+        <children>
+          <component id="77b1b" class="javax.swing.JTable" binding="current_bills">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
+      <scrollpane id="13cb0" binding="viewTablePane">
+        <constraints>
+          <grid row="8" column="3" row-span="7" col-span="3" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="500" height="280"/>
+            <preferred-size width="500" height="280"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="line" title="Account Activity" title-justification="1" title-position="1">
+          <font name="Arial" size="16" style="1"/>
+          <title-color color="-14049760"/>
+          <color color="-14049760"/>
+        </border>
+        <children>
+          <component id="6d42b" class="javax.swing.JTable" binding="bankTable">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
+      <component id="70ef" class="javax.swing.JButton" binding="editButton">
+        <constraints>
+          <grid row="16" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="30"/>
+            <preferred-size width="150" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-14049760"/>
+          <text value="EDIT"/>
+        </properties>
+      </component>
+      <vspacer id="76604">
+        <constraints>
+          <grid row="16" column="4" row-span="3" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+            <minimum-size width="25" height="-1"/>
+          </grid>
+        </constraints>
+      </vspacer>
+      <vspacer id="ff214">
+        <constraints>
+          <grid row="8" column="2" row-span="7" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+            <minimum-size width="15" height="-1"/>
+            <preferred-size width="15" height="-1"/>
+          </grid>
+        </constraints>
+      </vspacer>
+      <hspacer id="e1003">
+        <constraints>
+          <grid row="15" column="0" row-span="1" col-span="6" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="10"/>
+            <preferred-size width="-1" height="10"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <component id="aa3c" class="javax.swing.JLabel" binding="bill_due_name">
+        <constraints>
+          <grid row="12" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="11" style="1"/>
+          <foreground color="-6086888"/>
+          <text value="No Bills Due at This Time"/>
+        </properties>
+      </component>
+      <component id="20fd9" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-6086888"/>
+          <text value="------------------------------------------------------------------------"/>
+        </properties>
+      </component>
+      <component id="c42ff" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="200" height="25"/>
+            <preferred-size width="200" height="25"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="12" style="1"/>
+          <foreground color="-14049760"/>
+          <text value="Select Option to Add: "/>
+          <verticalAlignment value="1"/>
+          <verticalTextPosition value="1"/>
+        </properties>
+      </component>
+      <component id="fb5a6" class="javax.swing.JLabel" binding="type_name">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="25"/>
+            <preferred-size width="150" height="25"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="12" style="1"/>
+          <foreground color="-14049760"/>
+          <text value="Description Name:"/>
+        </properties>
+      </component>
+      <component id="e2593" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="100" height="25"/>
+            <preferred-size width="100" height="25"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="12" style="1"/>
+          <foreground color="-14049760"/>
+          <text value="Amount:"/>
+        </properties>
+      </component>
+      <component id="28070" class="javax.swing.JLabel" binding="label_date">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="50" height="25"/>
+            <preferred-size width="50" height="25"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="12" style="1"/>
+          <foreground color="-14049760"/>
+          <text value="Date:"/>
+        </properties>
+      </component>
+      <component id="c608d" class="javax.swing.JLabel" binding="next_bill_date">
+        <constraints>
+          <grid row="11" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="10" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="14" style="3"/>
+          <foreground color="-6086888"/>
+          <text value="NEXT BILL DUE ON: "/>
+          <verticalAlignment value="3"/>
+          <verticalTextPosition value="3"/>
+        </properties>
+      </component>
+      <hspacer id="84308">
+        <constraints>
+          <grid row="13" column="0" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="10"/>
+            <preferred-size width="-1" height="10"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <component id="3b7dd" class="javax.swing.JLabel" binding="row_selected_edit">
+        <constraints>
+          <grid row="16" column="3" row-span="3" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="11" style="1"/>
+          <foreground color="-14049760"/>
+          <horizontalAlignment value="4"/>
+          <text value="Select a Transaction Above to Edit or Delete"/>
+        </properties>
+      </component>
+      <hspacer id="ec41e">
+        <constraints>
+          <grid row="17" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="10"/>
+            <preferred-size width="-1" height="10"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <component id="24794" class="javax.swing.JButton" binding="deleteButton">
+        <constraints>
+          <grid row="18" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="30"/>
+            <preferred-size width="150" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-14049760"/>
+          <text value="DELETE"/>
+        </properties>
+      </component>
+      <hspacer id="b69fd">
+        <constraints>
+          <grid row="17" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="10"/>
+            <preferred-size width="-1" height="10"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <component id="33e19" class="javax.swing.JLabel" binding="bill_selected">
+        <constraints>
+          <grid row="16" column="0" row-span="3" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="250" height="15"/>
+            <preferred-size width="250" height="15"/>
+          </grid>
+        </constraints>
+        <properties>
+          <font name="Arial Black" size="11" style="1"/>
+          <foreground color="-6086888"/>
+          <text value="Select a Bill to Pay or Delete"/>
+        </properties>
+      </component>
+      <component id="87332" class="javax.swing.JButton" binding="pay_now">
+        <constraints>
+          <grid row="16" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="100" height="30"/>
+            <preferred-size width="100" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-6086888"/>
+          <font name="Arial" size="11" style="1"/>
+          <foreground color="-1446935"/>
+          <text value="PAY NOW"/>
+        </properties>
+      </component>
+      <component id="6ede8" class="javax.swing.JButton" binding="delete_bill">
+        <constraints>
+          <grid row="18" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="100" height="30"/>
+            <preferred-size width="100" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-6086888"/>
+          <font name="Arial" size="11" style="1"/>
+          <foreground color="-1446935"/>
+          <text value="DELETE BILL"/>
+        </properties>
+      </component>
+      <component id="640cd" class="javax.swing.JButton" binding="viewAllButton">
+        <constraints>
+          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="30"/>
+            <preferred-size width="150" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-14049760"/>
+          <text value="VIEW ALL"/>
+        </properties>
+      </component>
+      <component id="85475" class="javax.swing.JButton" binding="searchButton">
+        <constraints>
+          <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="30"/>
+            <preferred-size width="150" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-14049760"/>
+          <text value="SEARCH"/>
+        </properties>
+      </component>
+      <component id="2757f" class="javax.swing.JButton" binding="addButton">
+        <constraints>
+          <grid row="4" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="150" height="30"/>
+            <preferred-size width="150" height="30"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-14049760"/>
+          <text value="ADD"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

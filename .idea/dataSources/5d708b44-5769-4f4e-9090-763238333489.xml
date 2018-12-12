@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="BudgetDatabase">
+  <database-model serializer="dbm" rdbms="SQLITE" format-version="4.0">
+    <root id="1"/>
+    <schema id="2" parent="1">
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <table id="3" parent="2" name="billsDue"/>
+    <table id="4" parent="2" name="deposits"/>
+    <table id="5" parent="2" name="sqlite_sequence"/>
+    <table id="6" parent="2" name="transactions"/>
+    <column id="7" parent="3" name="ID">
+      <DataType>INTEGER(0,-1)|4</DataType>
+    </column>
+    <column id="8" parent="3" name="Bill_Name">
+      <Position>1</Position>
+      <DataType>TEXT(0,-1)|12</DataType>
+    </column>
+    <column id="9" parent="3" name="Bill_Amount">
+      <Position>2</Position>
+      <DataType>DECIMAL(10,2)(0,-1)|6</DataType>
+    </column>
+    <column id="10" parent="3" name="Due_Date">
+      <Position>3</Position>
+      <DataType>DATE(0,-1)|12</DataType>
+    </column>
+    <key id="11" parent="3">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="12" parent="4" name="ID">
+      <DataType>INTEGER(0,-1)|4</DataType>
+    </column>
+    <column id="13" parent="4" name="deposit_Name">
+      <Position>1</Position>
+      <DataType>TEXT(0,-1)|12</DataType>
+    </column>
+    <column id="14" parent="4" name="Amount">
+      <Position>2</Position>
+      <DataType>DECIMAL(10,2)(0,-1)|6</DataType>
+    </column>
+    <column id="15" parent="4" name="Date_Deposited">
+      <Position>3</Position>
+      <DataType>DATE(0,-1)|12</DataType>
+    </column>
+    <key id="16" parent="4">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="17" parent="5" name="name">
+      <DataType>(0,-1)|12</DataType>
+    </column>
+    <column id="18" parent="5" name="seq">
+      <Position>1</Position>
+      <DataType>(0,-1)|12</DataType>
+    </column>
+    <column id="19" parent="6" name="ID">
+      <DataType>INTEGER(0,-1)|4</DataType>
+    </column>
+    <column id="20" parent="6" name="Expense_Name">
+      <Position>1</Position>
+      <DataType>TEXT(0,-1)|12</DataType>
+    </column>
+    <column id="21" parent="6" name="Amount">
+      <Position>2</Position>
+      <DataType>DECIMAL(10,2)(0,-1)|6</DataType>
+    </column>
+    <column id="22" parent="6" name="Type">
+      <Position>3</Position>
+      <DataType>TEXT(0,-1)|12</DataType>
+    </column>
+    <column id="23" parent="6" name="PaidOn_Date">
+      <Position>4</Position>
+      <DataType>DATE(0,-1)|12</DataType>
+    </column>
+    <key id="24" parent="6">
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+  </database-model>
+</dataSource>
