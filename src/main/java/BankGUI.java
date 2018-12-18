@@ -14,6 +14,13 @@ import java.util.Vector;
 
 /**
  * Created by Ashley Johnson on 12/11/2018.
+ *
+ * The GUI for the database. It talks to the tableModel and the Database. It credits Bills, Expenses, and Credits. It has
+ * a user input validation method, and an updateTable method that re fires the tables and resets the gui to it's default
+ * values. If expense is selected from the option drop down menu, the expense type selector becomes visible.
+ *
+ * The labels on the gui change based on which option you choose; Bill, Deposit or Expense. All buttons and tables have
+ * listeners to update as the user conducts CRUD operations.
  */
 public class BankGUI extends JFrame {
     private JPanel MainPanel;
@@ -37,18 +44,22 @@ public class BankGUI extends JFrame {
     private JComboBox<String> expense_type;
     private JButton quitButton;
 
+    //initialize the database
     private BudgetDB db;
 
+    //declare defaults for labels and text fields
     private String nameDefault = "Description Name:";
     private String dateDefault = "Date:";
     private String dateFieldDefault = "MM-dd-yyy";
 
+    //declare instances of the table models and columnNames
     private BankTableModel bankModel;
     private BankTableModel billModel;
     private Vector<String> bankColNames;
     private Vector<String> billColNames;
-    private String table;
+    private String table; //instantiate a global variable for the table selected name
 
+    //construct the gui with a current instance of the database
     BankGUI (BudgetDB db){
         //Create a local instance
         this.db = db;
@@ -57,7 +68,7 @@ public class BankGUI extends JFrame {
         pack();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
+        //Add combobox values
         typeSelector.addItem("Select From the List");
         typeSelector.addItem("Bill");
         typeSelector.addItem("Deposit");
@@ -73,7 +84,7 @@ public class BankGUI extends JFrame {
         expense_type.addItem("Other");
 
         getRootPane().setDefaultButton(addButton);
-
+        //load the gui, wait for listeners
         setDefaults();
         configureTables();
         addListeners();
@@ -81,6 +92,7 @@ public class BankGUI extends JFrame {
 
 
     }
+    //listen for what the user selects in the options combo box. change the labels and set visibility based on selection
     private void addListeners(){
         typeSelector.addItemListener(new ItemListener() {
             @Override
@@ -111,7 +123,7 @@ public class BankGUI extends JFrame {
             }
         });
 
-
+        //listen for add button. assign the option selection to a string, pass it for data input validation
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,7 +131,7 @@ public class BankGUI extends JFrame {
                validateData(selection);
             }
         });
-
+        //listener for delete button for transaction tabel model. assign table name constant, pass to deleteSelection method
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,6 +140,8 @@ public class BankGUI extends JFrame {
                 deleteSelection(tableName);
             }
         });
+        //table listener for current bills cell edits. setValueAt talks to the database to update with the changes
+        // updateTable method calls a fireTableDataChanged to refresh table
         current_bills.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -138,7 +152,8 @@ public class BankGUI extends JFrame {
                 updateTable();
             }
         });
-
+        //listener for the transaction table. setValue at calls the database to update the correct table with the changes
+        //updateTable refreshes the gui and table.
         bankTable.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -149,6 +164,7 @@ public class BankGUI extends JFrame {
                 updateTable();
             }
         });
+        //bill pay button. when pressed it adds the selected bill to the transaction table, and deletes it from the billtable.
         pay_now.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -169,6 +185,7 @@ public class BankGUI extends JFrame {
 
             }
         });
+        //this is for when you made an error or a bill was forgiven without payment. deletes it from the bill table.
         delete_bill.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -177,6 +194,7 @@ public class BankGUI extends JFrame {
             }
         });
 
+        //disposes the gui. closes the program.
         quitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -187,6 +205,7 @@ public class BankGUI extends JFrame {
 
 
     }
+    //reset the gui
     public void setDefaults(){
         type_name.setText(nameDefault);
         amount.setText("");
@@ -199,7 +218,8 @@ public class BankGUI extends JFrame {
         calculateFunds();
         nextBillDue();
     }
-
+    //validate user input. If the selection is empty, or equals a default, prompt the user to enter a date. catches the
+    //NumberFormatException for non-numeric entry on date and amount.
     public void validateData(String selection){
         String name = "";
         double amt = 0.0;
@@ -227,6 +247,11 @@ public class BankGUI extends JFrame {
                 expenseType = expense_type.getSelectedItem().toString();
             }
 
+            /*
+            ONCE VALIDATED USE IF STATEMENTS TO ASSIGN THE RAW USER DATA A CLASS, AND CORRESPONDING TABLE.
+
+             */
+
             if (selection.equals("Expense")) {
                 table = BudgetDB.TRANSACTION_TABLE;
                 addExpense(name, amt, date, expenseType);
@@ -251,7 +276,7 @@ public class BankGUI extends JFrame {
 
         Expense expense = new Expense(name, amt, datePaid, expenseType);
         String result = db.addTransToDB(expense);
-
+        //If database entry was successful update table.
         if (result.equals(BudgetDB.OK)){
             updateTable();
         }else{
@@ -262,6 +287,7 @@ public class BankGUI extends JFrame {
         Credit deposit = new Credit(name, amt, dateAdded);
 
         String result = db.addTransToDB(deposit);
+        //if successful, update table
         if (result.equals(BudgetDB.OK)){
             updateTable();
         }else{
@@ -273,7 +299,7 @@ public class BankGUI extends JFrame {
         Bill bill = new Bill (name, amt, due_date);
 
         String result = db.BillToDB(bill);
-
+        //if successfully added to the database, update table
         if (result.equals(BudgetDB.OK)){
             updateTable();
         }else{
@@ -282,6 +308,10 @@ public class BankGUI extends JFrame {
 
     }
     public void deleteSelection(String tableName) {
+        //use an if statement to choose which table the item is to be deleted from
+        //if the user did not select a row to be deleted, it will return -1. If the selectedRow = -1 prompt the
+        //user to select what they want to delete. if they did select a row, send the row index and the table name
+        //to the database delete method.
         int currentRow;
         if (tableName.equals(BudgetDB.BILL_TABLE)) {
             currentRow = current_bills.getSelectedRow();
@@ -290,6 +320,7 @@ public class BankGUI extends JFrame {
 
             }else{
                 db.deleteFromDB(tableName, currentRow);
+                updateTable();
             }
 
         }
@@ -299,13 +330,15 @@ public class BankGUI extends JFrame {
                 errorDialog("You haven't selected a row");
             }else{
                 db.deleteFromDB(tableName,currentRow);
+                updateTable();
             }
         }
 
-        updateTable();
+
     }
 
-
+    //method to calculate the total funds available, and total funds once all bills are paid.
+    //call the database methods to add up the totals for both the bill table and the after bill pay table.
     public void calculateFunds(){
         String totalCash = String.valueOf(db.bankTotal());
 
@@ -316,6 +349,7 @@ public class BankGUI extends JFrame {
         after_billpay.setText(totalBills);
 
     }
+    //method to populate when your next bill is due, what the name of it is, and how much. set gui labels
     public void nextBillDue() {
         ArrayList<Bill> nextBill = new ArrayList<>();
         nextBill = db.earliestDate();
@@ -328,7 +362,7 @@ public class BankGUI extends JFrame {
         }
 
     }
-
+    //date formatter to return a formatted String of the current date
     private static String getCurrentDate(){
 
 
@@ -341,6 +375,7 @@ public class BankGUI extends JFrame {
 
 
     }
+    //date formatter to get the current date in the java.util.Date datatype.
     private Date getDateNow(){
 
         try {
@@ -356,6 +391,7 @@ public class BankGUI extends JFrame {
 
 
     }
+    //another date converter but to take a legacy date and convert it to a java.util.Date.
     private java.util.Date convertDate(String date){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
         try {
@@ -369,7 +405,7 @@ public class BankGUI extends JFrame {
         }
 
     }
-
+    //configure table load on startup
     private void configureTables(){
 
         current_bills.setGridColor(Color.GRAY);
@@ -391,6 +427,7 @@ public class BankGUI extends JFrame {
 
 
     }
+    //update table after every Listener and CRUD operation
     public void updateTable(){
         Vector <Bank> bankData = db.getAll(BudgetDB.TRANSACTION_TABLE);
         Vector <Bank> billData = db.getAll(BudgetDB.BILL_TABLE);
@@ -401,7 +438,7 @@ public class BankGUI extends JFrame {
         setDefaults();
 
 
-    }
+    }//error messaging
      void errorDialog(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }

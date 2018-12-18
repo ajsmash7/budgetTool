@@ -177,12 +177,12 @@ import java.util.Vector;
             ps.setString(4, TRANS_TYPE_COLUMN);
             ps.setString(5, transaction.getName());
             ps.setDouble(6, transaction.getAmount());
-            ps.setDate(7, new java.sql.Date(transaction.getDate().getTime()));
+            ps.setDate(7, new java.sql.Date(transaction.getDate().getTime())); //attempting to parse into sqlDate
             ps.setString(8, transaction.getExpenseType());
 
             ps.executeUpdate();
 
-            return OK;
+            return OK; //If successful return ok
 
         }catch (SQLException e){
             System.out.println("Could not add expense");
@@ -191,12 +191,12 @@ import java.util.Vector;
         }
 
     }
-
+    //add bill to database
     public String BillToDB(Bill bill){
         try (Connection connection = DriverManager.getConnection(db_url);
              PreparedStatement p = connection.prepareStatement(ADD_BILL)){
 
-
+            //add name, amt, and date from Bill object to bill date
             p.setString(1, BILL_NAME_COLUMN);
             p.setString(2, BILL_AMT_COLUMN);
             p.setString(3, DUE_DATE_COLUMN);
@@ -216,6 +216,8 @@ import java.util.Vector;
 
     }
 
+    //Delete from the passed table name, where ID equals the selected row in the table. variable arguments from BankGUI
+     //deleteSeletion and pay_billButton action event
     public String deleteFromDB(String table, int ID) {
         String deleteSQL = "DELETE FROM ? WHERE ?=?";
         try (Connection conn = DriverManager.getConnection(db_url);
@@ -236,21 +238,25 @@ import java.util.Vector;
         }
     }
 
+        //this method is called by the setValueAt method in the BanktableModel class, from the table listener event.
+        // When a cell is updated, the table listener fires, and calls the setValueAt method in the model.
+        // which calls this method to update the row in which the changes were made. The table is selected based on
+        //the class of the Bank object. Nill updates the bill table, expense and credits update the transaction table.
         public static String updateDB(Bank transaction, int ID){
 
         Class<? extends Bank> c = transaction.getClass();
         String updateSQL = " ";
-
+        //choose the appropriate update statement, based on the class
         if (c == Bill.class) {
              updateSQL = "UPDATE billsDue SET ?=? SET ?=? SET ?=? WHERE ?=?";
         }if (c == Expense.class || c == Credit.class) {
                 updateSQL = "UPDATE transactions SET ?=? SET ?=? SET ?=? SET ?=? WHERE ?=?";
             }
-
+            //open the database connection in a try with resources
             try (Connection conn = DriverManager.getConnection(db_url)) {
                 try (PreparedStatement ps = conn.prepareStatement(updateSQL)) {
 
-
+                    //wrap the preparedStatement setters in if statements to assign based on class
                     if (c == Bill.class) {
 
                         ps.setString(1, BILL_NAME_COLUMN);
@@ -264,7 +270,7 @@ import java.util.Vector;
 
                         ps.executeUpdate();
 
-                        return OK;
+                        return OK; //return ok if successful
                     }
                     if (c == Expense.class || c == Credit.class) {
 
@@ -281,25 +287,28 @@ import java.util.Vector;
 
                         ps.executeUpdate();
 
-                        return OK;
+                        return OK; //return ok if successful
 
                     }else{
-                        return "Error";
+                        return "Class Error"; //if the class was not properly assigned, through an error
                     }
                 }
             } catch (SQLException e) {
                 e.getStackTrace();
-                return ("Could not update the row");
+                return ("Could not update the row"); //throw an error if unsuccessful
             }
         }
-
+    //a calculation method for the labe displaying the total of the transaction table.
+     //when a new Expense is added to the transaction table, it calls a method called NegAmt() to turn the user
+     //entry value into a negative value before applying to the database. This way, it can simply total the rows
+     // while still user friendly.
     public double bankTotal() {
         double columnTotal = 0;
         String creditSQL = "SELECT * FROM transactions";
         try (Connection conn = DriverManager.getConnection(db_url);
              Statement ps = conn.createStatement()) {
 
-
+            //while there are rows, add next value in the amount column to total
             ResultSet rs = ps.executeQuery(creditSQL);
             while (rs.next()) {
                 double amt = rs.getDouble(TRANS_AMT_COLUMN);
@@ -307,7 +316,7 @@ import java.util.Vector;
             }
 
 
-            return columnTotal;
+            return columnTotal;//return the total amount
 
         } catch (SQLException e) {
             System.out.println("ERROR LOADING");
@@ -316,13 +325,14 @@ import java.util.Vector;
         }
 
     }
-
+    //add up all the bills to be able to deduct the total bills due from the available cash and display it in the
+     //after bills paid column of available funds
     public double billTotal(){
         double total = 0;
         String billSQL = "SELECT * FROM billsDue";
         try (Connection conn = DriverManager.getConnection(db_url);
              Statement ps = conn.createStatement()) {
-
+            //while there are still rows, add the value in the amount column to total.
             ResultSet rs = ps.executeQuery(billSQL);
             while (rs.next()) {
                 double amt = rs.getDouble(BILL_AMT_COLUMN);
@@ -339,6 +349,9 @@ import java.util.Vector;
 
 
     }
+
+    //Query the data in the current bills database, and order them by date. Take the values of the first row and store
+     //them in an array list, return the array list to the gui to retrieve the data for display in the current_bill_due labels.
 
     public ArrayList<Bill> earliestDate(){
         ArrayList<Bill> nextBill = new ArrayList<>();
@@ -373,6 +386,8 @@ import java.util.Vector;
         }
 
     }
+
+    //custom method to convert date from java.util.Date to java.sql.Date. Doesn't work or vis a versa.
 
      public static java.util.Date convertSQLDate(
              java.sql.Date sqlDate) {

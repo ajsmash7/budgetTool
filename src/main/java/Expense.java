@@ -2,6 +2,8 @@ import java.util.Date;
 
 /**
  * Created by Ashley Johnson on 12/11/2018.
+ *
+ * subclass of Bank that implements class interface Budget.
  */
 public class Expense extends Bank implements Budget {
 
