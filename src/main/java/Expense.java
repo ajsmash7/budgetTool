@@ -1,25 +1,24 @@
-import java.util.Date;
+import java.sql.Date;
 
 /**
  * Created by Ashley Johnson on 12/11/2018.
  */
-public class Expense extends Bank {
+public class Expense extends Bank implements Budget {
 
-    protected Date addDate;
-    protected String expenseType;
+    String expenseType;
 
-    public Expense(int addID, String addName, double addAmt, String type, Date dateEntered){
-        super(addID, addName, addAmt);
-        this.addDate = dateEntered;
+    public Expense(){
+        super();
+    }
+
+    public Expense(String addName, double addAmt, Date dateEntered, String type){
+        super(addName, addAmt, dateEntered);
         this.expenseType = type;
     }
 
-    public Date getAddDate() {
-        return addDate;
-    }
-
-    public void setAddDate(Date addDate) {
-        this.addDate = addDate;
+    public Expense(int addID, String addName, double addAmt, Date dateEntered, String type){
+        super(addID, addName, addAmt, dateEntered);
+        this.expenseType = type;
     }
 
     public String getExpenseType() {

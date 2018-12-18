@@ -1,16 +1,27 @@
+import java.sql.Date;
+
 /**
  * Created by Ashley Johnson on 12/10/2018.
  */
-public class Bank {
+public abstract class Bank implements Budget{
+    int ID;
+    String name;
+    double amount;
+    Date date;
 
-    protected int ID;
-    protected String name;
-    protected double amount;
+    public Bank (){}
 
-    public Bank(int addID, String addName, double addAmt){
+    public Bank(String addName, double addAmt, Date dateAdd){
+        this.name = addName;
+        this.amount = addAmt;
+        this.date = dateAdd;
+    }
+
+    public Bank(int addID, String addName, double addAmt, Date dateAdd){
         this.ID = addID;
         this.name = addName;
         this.amount = addAmt;
+        this.date = dateAdd;
     }
 
     public int getID() {
@@ -20,7 +31,6 @@ public class Bank {
     public void setID(int ID) {
         this.ID = ID;
     }
-
     public String getName() {
         return name;
     }
@@ -36,4 +46,16 @@ public class Bank {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public double getNegAmt(double amt){return 0-amt;}
+
+    public void setNegAmt (double negAmt){this.amount = negAmt;}
 }

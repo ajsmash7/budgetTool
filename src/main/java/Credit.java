@@ -1,22 +1,27 @@
-import java.util.Date;
+import java.sql.Date;
 
 /**
  * Created by Ashley Johnson on 12/11/2018.
  */
-public class Credit extends Bank {
+public class Credit extends Bank implements Budget{
 
-    protected final Date PaidOn_Date;
+    String expenseType;
 
-    public Credit(int addID, String addName, double addAmt, Date depositDate){
-        super(addID, addName, addAmt);
-        this.PaidOn_Date = depositDate;
+
+    public Credit(){
+        super();
     }
 
-    public Date getPaidOn_Date() {
-        return PaidOn_Date;
+    public Credit (String addName, double addAmt, Date depositDate){
+        super(addName, addAmt, depositDate);
     }
 
-    public void setPaidOn_Date(Date paidOn_Date) {
-        PaidOn_Date = paidOn_Date;
+    public Credit (int addID, String addName, double addAmt, Date dateEntered, String type) {
+        super(addID, addName, addAmt, dateEntered);
+        this.expenseType = type;
+    }
+
+    public String getExpenseType(){
+        return "Deposit";
     }
 }

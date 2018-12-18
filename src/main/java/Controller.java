@@ -3,8 +3,8 @@
  */
 public class Controller {
 
-    private BankGUI gui;
-    private BudgetDB db;
+    protected BankGUI gui;
+    protected BudgetDB db;
 
     public static void main(String[] args) {new Controller().startApp(); }
 
