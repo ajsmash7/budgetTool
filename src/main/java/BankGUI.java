@@ -6,10 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -25,7 +25,7 @@ public class BankGUI extends JFrame {
     private JTable bankTable;
     private JLabel label_date;
     private JButton pay_now;
-    private JLabel after_bill_pay;
+    private JLabel after_billpay;
     private JLabel available_cash;
     private JTable current_bills;
     private JButton addButton;
@@ -69,6 +69,7 @@ public class BankGUI extends JFrame {
         expense_type.addItem("Dining");
         expense_type.addItem("Shopping");
         expense_type.addItem("Entertainment");
+        expense_type.addItem("Cash");
         expense_type.addItem("Other");
 
         getRootPane().setDefaultButton(addButton);
@@ -153,9 +154,9 @@ public class BankGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String tableName = BudgetDB.BILL_TABLE;
                 int row = current_bills.getSelectedRow();
-                String name = (String)current_bills.getValueAt(row, 1);
+                String name = "PAID: " + current_bills.getValueAt(row, 1);
                 double amount = (double)current_bills.getValueAt(row, 2);
-                Date date = convertDate(getCurrentDate());
+                Date date = getDateNow();
                 Bill bill = new Bill(name, amount, date);
                 String result = db.addTransToDB(bill);
 
@@ -312,7 +313,7 @@ public class BankGUI extends JFrame {
 
         String totalBills = String.valueOf(db.billTotal());
 
-        after_bill_pay.setText(totalBills);
+        after_billpay.setText(totalBills);
 
     }
     public void nextBillDue() {
@@ -328,22 +329,40 @@ public class BankGUI extends JFrame {
 
     }
 
-    private String getCurrentDate(){
-        java.util.Date date = new java.util.Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
-        String currentDate = dateFormat.format(date);
+    private static String getCurrentDate(){
 
-        return currentDate;
+
+            java.util.Date date = new java.util.Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+            String currentDate = dateFormat.format(date);
+
+            return currentDate;
+
 
 
     }
-    private java.sql.Date convertDate(String date){
+    private Date getDateNow(){
+
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+
+            String dateString = format.format(new Date());
+            Date date = format.parse(dateString);
+            return date;
+        }catch (ParseException d){
+            errorDialog("Can't parse date");
+            throw new RuntimeException(d);
+        }
+
+
+    }
+    private java.util.Date convertDate(String date){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
         try {
             java.util.Date parsedDate = dateFormat.parse(date);
-            java.sql.Date dbDate = new java.sql.Date(parsedDate.getTime());
 
-            return dbDate;
+
+            return parsedDate;
         } catch (ParseException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -383,7 +402,7 @@ public class BankGUI extends JFrame {
 
 
     }
-    public void errorDialog(String msg) {
+     void errorDialog(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 

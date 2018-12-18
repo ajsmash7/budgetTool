@@ -1,17 +1,27 @@
 /**
  * Created by Ashley Johnson on 12/10/2018.
+ *
+ * My giant database File! It would have been longer had I not figured out how to use class wildcards.
+ * This program would work beautifully.... if java.sql.Date weren't so difficult to parse. That is what is holding
+ * this program up from executing. I can't get the dates to parse.
  */
 
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Vector;
 
  class BudgetDB {
 
+
+    //Database Link
     private static final String db_url = "jdbc:sqlite:C:\\Users\\Ashley Johnson\\IdeaProjects\\budgetTool\\src\\main\\java\\BudgetDatabase";
-     static String BILL_TABLE = "billsDue";
+
+    //database table name constants
+    static String BILL_TABLE = "billsDue";
      static String TRANSACTION_TABLE = "transactions";
 
+     //Column name constants
     private static final String ID_COLUMN = "ID";
     private static final String BILL_NAME_COLUMN = "Bill_Name";
     private static final String BILL_AMT_COLUMN = "Bill_Amount";
@@ -24,8 +34,8 @@ import java.util.*;
 
 
     //Create Table SQL strings
-    private static final String CREATE_BILL_TABLE = "CREATE TABLE IF NOT EXISTS billsDue(ID INTEGER PRIMARY KEY , Bill_Name TEXT, Bill_Amount DECIMAL(10,2), Due_Date DATE)";
-    private static final String CREATE_TRANSACTION_TABLE = "CREATE TABLE IF NOT EXISTS transactions(ID INTEGER PRIMARY KEY, Description TEXT, Amount DECIMAL(10,2), Type TEXT, PaidOn_Date DATE)";
+    private static final String CREATE_BILL_TABLE = "CREATE TABLE IF NOT EXISTS billsDue(ID INTEGER PRIMARY KEY , Bill_Name TEXT, Bill_Amount DECIMAL(10,2), Due_Date TEXT)";
+    private static final String CREATE_TRANSACTION_TABLE = "CREATE TABLE IF NOT EXISTS transactions(ID INTEGER PRIMARY KEY, Description TEXT, Amount DECIMAL(10,2), Type TEXT, PaidOn_Date TEXT)";
 
     //SQL Strings for Statements
     private static final String GET_ALL_TRANSACTIONS = "SELECT * FROM transactions";
@@ -34,8 +44,10 @@ import java.util.*;
     private static final String ADD_BILL = "INSERT INTO billsDue (?,?,?) VALUES (?,?,?)";
 
 
-    BudgetDB(){createTables();}
+    BudgetDB(){createTables();} //call the constructor to create the instance of the database.
 
+    //Call method to create tables. Use try-catch with resources to establish the connection with the database.
+     //Since we are executing two tables, it is best to use a Statement statement
     private void createTables(){
         try (Connection conn = DriverManager.getConnection(db_url);
             Statement statement = conn.createStatement()){
@@ -47,13 +59,17 @@ import java.util.*;
 
         }catch (SQLException e){
             System.out.println("Could not create tables");
+            e.getStackTrace();
             throw new RuntimeException(e);
-        }
+        }//always throw a new Runtime to see what the exact call was.
     }
 
+    //create the Vector of column names, based on the table name it receives
     Vector getColumnNames(String table){
+        //Declare a new vector of strings
         Vector <String> columnNames = new Vector<>();
 
+        //use a switch statement to assign the column names for each table. break out of switch after assignments
         switch (table){
             case "billsDue":
                 columnNames.add("ID");
@@ -69,25 +85,28 @@ import java.util.*;
                 columnNames.add("PaidOn_Date");
                 break;
             default:
-                System.out.println("I'm throwing an error");
+                System.out.println("I'm throwing an error, table name incorrect"); //throw an error if table name doesn't match
         }
 
-        return columnNames;
+        return columnNames; //return vector
 
     }
-
+    //call method to fetch all Bank objects from the table requested.
     Vector<Bank> getAll (String table){
-        //request connection to database and statement connection
+
+        //request connection to database and statement connection, since we want all columns from more than one table.
         try (Connection conn = DriverManager.getConnection(db_url);
         Statement statement = conn.createStatement()){
+
             //Declare a vector of vector objects. each vector object contains the data of one table row.
             Vector<Bank> allResults = new Vector<>();
 
             //Use a switch statement to pull the data from the table option passed to the method.
             //each case will query the corresponding table, and loop through all the rows in the table
-            //for each row iteration, declare a new empty vector called row, and add each cell value to it
-            //then add the loop local row vector to the method local allResults vector.
+            //for each row iteration, declare and assign a corresponding Bank subclass object
+            //then add the loop local object to the method local allResults vector.
             //at the completion of the loop iterations, break out of the switch statement and return allResults vector
+            //to the GUI Table Model
             switch (table){
                 case "billsDue":
                     ResultSet bills = statement.executeQuery(GET_ALL_BILLS);
@@ -95,9 +114,12 @@ import java.util.*;
                         int ID = bills.getInt(ID_COLUMN);
                         String name = bills.getString(BILL_NAME_COLUMN);
                         double amt = bills.getDouble(BILL_AMT_COLUMN);
-                        Date date = bills.getDate(DUE_DATE_COLUMN);
 
-                        Bill row = new Bill(ID, name, amt, date);
+                        java.sql.Date date = bills.getDate(DUE_DATE_COLUMN);
+
+                        java.util.Date addDate= convertSQLDate(date);
+
+                        Bill row = new Bill(ID, name, amt, addDate);
 
                         allResults.add(row);
                     }
@@ -109,9 +131,11 @@ import java.util.*;
                         String name = rs.getString(TRANS_DESC_COLUMN);
                         double amt = rs.getDouble(TRANS_AMT_COLUMN);
                         String type = rs.getString (TRANS_TYPE_COLUMN);
-                        Date date = rs.getDate(TRANS_PAID_COLUMN);
+                        java.sql.Date date = rs.getDate(TRANS_PAID_COLUMN);
 
-                        Expense row = new Expense(ID, name, amt, date,type);
+                        java.util.Date addDate = convertSQLDate(date);
+
+                        Expense row = new Expense(ID, name, amt,addDate,type);
 
                         allResults.add(row);
                     }
@@ -120,20 +144,29 @@ import java.util.*;
                     System.out.println("I'm throwing an error");
             }
 
-            //Return the vector of vectors containing the contents of the database table requested.
+            //Return the vector of Bank objects containing the contents of the database table requested.
             return allResults;
 
             }catch (SQLException e){
             System.out.println("Error fetching all records");
+            e.getStackTrace();
             throw new RuntimeException(e);
             }
     }
+    /*
+    DATABASE PREPARE STATEMENT METHODS FOR CRUD OPERATIONS
 
+    They accept a generic Bank Object called transaction that uses a class wildcard to dynamically update database
+    values based on class assignment.
+
+    I'M CURRENTLY UNABLE TO GET THE DATES TO PARSE CORRECTLY
+     */
     public String addTransToDB(Bank transaction){
         Class <? extends Bank> c = transaction.getClass();
         if (c == Bill.class || c == Expense.class){
             double negAmt = transaction.getNegAmt(transaction.getAmount());
             transaction.setNegAmt(negAmt);
+
         }
         try (Connection conn = DriverManager.getConnection(db_url);
              PreparedStatement ps = conn.prepareStatement(ADD_EXPENSE)){
@@ -144,7 +177,7 @@ import java.util.*;
             ps.setString(4, TRANS_TYPE_COLUMN);
             ps.setString(5, transaction.getName());
             ps.setDouble(6, transaction.getAmount());
-            ps.setDate(7, transaction.getDate());
+            ps.setDate(7, new java.sql.Date(transaction.getDate().getTime()));
             ps.setString(8, transaction.getExpenseType());
 
             ps.executeUpdate();
@@ -153,6 +186,7 @@ import java.util.*;
 
         }catch (SQLException e){
             System.out.println("Could not add expense");
+            e.getStackTrace();
             throw new RuntimeException(e);
         }
 
@@ -168,14 +202,15 @@ import java.util.*;
             p.setString(3, DUE_DATE_COLUMN);
             p.setString(4, bill.getName());
             p.setDouble(5, bill.getAmount());
-            p.setDate(6, bill.getDate());
+            p.setDate(6, new java.sql.Date(bill.getDate().getTime()));
 
             p.executeUpdate();
 
             return OK;
 
         }catch (SQLException sqle){
-            System.out.println("Could not create tables");
+            System.out.println("Could not add to Bills");
+            sqle.getStackTrace();
             throw new RuntimeException(sqle);
         }
 
@@ -196,6 +231,7 @@ import java.util.*;
 
         } catch (SQLException e) {
             System.out.println("Could not delete from database");
+            e.getStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -222,7 +258,7 @@ import java.util.*;
                         ps.setString(3, BILL_AMT_COLUMN);
                         ps.setDouble(4, transaction.getAmount());
                         ps.setString(5, DUE_DATE_COLUMN);
-                        ps.setDate(6, transaction.getDate());
+                        ps.setDate(6, new java.sql.Date(transaction.getDate().getTime()));
                         ps.setString(7, ID_COLUMN);
                         ps.setInt(8, ID);
 
@@ -237,7 +273,7 @@ import java.util.*;
                         ps.setString(3, TRANS_AMT_COLUMN);
                         ps.setDouble(4, transaction.getAmount());
                         ps.setString(5, TRANS_PAID_COLUMN);
-                        ps.setDate(6, transaction.getDate());
+                        ps.setDate(6, new java.sql.Date(transaction.getDate().getTime()));
                         ps.setString(7, TRANS_TYPE_COLUMN);
                         ps.setString(8, transaction.getExpenseType());
                         ps.setString(9, ID_COLUMN);
@@ -252,6 +288,7 @@ import java.util.*;
                     }
                 }
             } catch (SQLException e) {
+                e.getStackTrace();
                 return ("Could not update the row");
             }
         }
@@ -270,13 +307,14 @@ import java.util.*;
             }
 
 
-
+            return columnTotal;
 
         } catch (SQLException e) {
             System.out.println("ERROR LOADING");
+            e.getStackTrace();
             throw new RuntimeException(e);
         }
-        return columnTotal;
+
     }
 
     public double billTotal(){
@@ -295,6 +333,7 @@ import java.util.*;
 
         } catch (SQLException e) {
             System.out.println("Could not load bill data");
+            e.getStackTrace();
             throw new RuntimeException(e);
         }
 
@@ -312,10 +351,14 @@ import java.util.*;
             ResultSet rs = ps.executeQuery();
             int ID = rs.getInt(ID_COLUMN);
             String name = rs.getString(BILL_NAME_COLUMN);
-            Date date = rs.getDate(DUE_DATE_COLUMN);
+            java.sql.Date date = rs.getDate(DUE_DATE_COLUMN);
             double amt = rs.getDouble(BILL_AMT_COLUMN);
 
-            Bill bill = new Bill(ID, name, amt, date);
+            java.util.Date addDate = convertSQLDate(date);
+
+
+
+            Bill bill = new Bill(ID, name, amt, addDate);
 
             nextBill.add(bill);
 
@@ -325,12 +368,20 @@ import java.util.*;
 
         } catch (SQLException e) {
             System.out.println("Could not pull data from database");
+            e.getStackTrace();
             throw new RuntimeException(e);
         }
 
     }
 
-
+     public static java.util.Date convertSQLDate(
+             java.sql.Date sqlDate) {
+         java.util.Date javaDate = null;
+         if (sqlDate != null) {
+             javaDate = new Date(sqlDate.getTime());
+         }
+         return javaDate;
+     }
 
 
 

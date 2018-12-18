@@ -1,19 +1,29 @@
 import javax.swing.table.AbstractTableModel;
-import java.sql.Date;
+import java.util.Date;
 import java.util.Vector;
 
 /**
  * Created by Ashley Johnson on 12/12/2018.
+ *
+ * Since I have two Jtables, and more importantly am implementing the use of Object subclasses, I have to use an
+ * AbstractTableModel.
+ * This model populates its data from a Vector of Bank objects, and a Vector of column names. Preferably you would
+ * completely define the tableModel with Thread safe ArrayLists, but due to assignment time constraints I am extending
+ * AbstractTableModel instead of implementing TableModel to use some of it's built in functions to construct the tables.
+ *
  */
 public class BankTableModel extends AbstractTableModel {
     private Vector<Bank> data;
     private Vector<String> dataColumnNames;
+    //initialize vectors
 
+    //Model Constructor
     BankTableModel(Vector<Bank> tableData, Vector<String> columns) {
         this.data = tableData;
         this.dataColumnNames = columns;
     }
 
+    //get and set methods
     public Vector<Bank> getData() {
         return data;
     }
@@ -29,6 +39,14 @@ public class BankTableModel extends AbstractTableModel {
     public void setDataColumnNames(Vector<String> dataColumnNames) {
         this.dataColumnNames = dataColumnNames;
     }
+
+    /*
+    Overridden methods to customize it to the Vector <Bank> and Vector<String> data types instead of a Vector of Vectors
+    Or a vector of arrays.
+
+    Defines those necessary to the functionality of AbstractTableModel getRowCount, getColumnCount and custom getValueAt
+    which allows me to define the data types of each cell
+     */
 
     @Override
     public int getRowCount() {
@@ -62,6 +80,10 @@ public class BankTableModel extends AbstractTableModel {
             return "Could not find";
         }
     }
+
+    //setValueAt method talks to database to update the row in the database containing the cell that was changed.
+    //There is a corresponding TableModelListener for each table in the gui that calls this method to update the DB
+    //and fire table data change.
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
@@ -100,7 +122,9 @@ public class BankTableModel extends AbstractTableModel {
         return super.getColumnName(column);
     }
 
-
+    //Custom method that I created to behave as setDataVector() does for DefaultTableModel
+    //updateTable() in BankGUI is called to fetch the updated rows from the database
+    //then calls this method to reset the data, and first table data change.
     public void resetData(Vector<Bank> refreshData, Vector<String> columnNames) {
         setData(refreshData);
         setDataColumnNames(columnNames);
