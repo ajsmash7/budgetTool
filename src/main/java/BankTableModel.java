@@ -90,7 +90,8 @@ public class BankTableModel extends AbstractTableModel {
                 System.out.println("ERROR in column count, current count: " + getColumnCount());
             }
         } catch (NumberFormatException n){
-            BankGUI.errorDialog("Cell entry is invalid");
+            System.out.println("Cell entry is invalid");
+            throw new RuntimeException(n);
         }
     }
 
