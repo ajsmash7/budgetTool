@@ -1,6 +1,4 @@
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,7 +48,7 @@ public class BankGUI extends JFrame {
     //declare defaults for labels and text fields
     private String nameDefault = "Description Name:";
     private String dateDefault = "Date:";
-    private String dateFieldDefault = "MM-dd-yyy";
+    private String dateFieldDefault = "yyyy-MM-dd";
 
     //declare instances of the table models and columnNames
     private BankTableModel bankModel;
@@ -94,6 +92,7 @@ public class BankGUI extends JFrame {
     }
     //listen for what the user selects in the options combo box. change the labels and set visibility based on selection
     private void addListeners(){
+
         typeSelector.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -142,28 +141,28 @@ public class BankGUI extends JFrame {
         });
         //table listener for current bills cell edits. setValueAt talks to the database to update with the changes
         // updateTable method calls a fireTableDataChanged to refresh table
-        current_bills.getModel().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                int row = current_bills.getSelectedRow();
-                int column = current_bills.getSelectedColumn();
-                Object a = current_bills.getValueAt(row,column);
-                current_bills.setValueAt(a, row, column);
-                updateTable();
-            }
-        });
+        //current_bills.getModel().addTableModelListener(new TableModelListener() {
+          //  @Override
+            //public void tableChanged(TableModelEvent e) {
+              //  int row = current_bills.getSelectedRow();
+                //int column = current_bills.getSelectedColumn();
+                //Object a = current_bills.getValueAt(row,column);
+                //current_bills.setValueAt(a, row, column);
+                //updateTable();
+           // }
+        //});
         //listener for the transaction table. setValue at calls the database to update the correct table with the changes
         //updateTable refreshes the gui and table.
-        bankTable.getModel().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
+        //bankTable.getModel().addTableModelListener(new TableModelListener() {
+            //@Override
+            //public void tableChanged(TableModelEvent e) {
                 //int column = bankTable.getSelectedColumn();
                 //int row = bankTable.getSelectedRow();
                 //Object a = bankTable.getValueAt(row, column);
                 //bankTable.setValueAt(a, row, column);
-                updateTable();
-            }
-        });
+               // updateTable();
+            //}
+        //});
         //bill pay button. when pressed it adds the selected bill to the transaction table, and deletes it from the billtable.
         pay_now.addActionListener(new ActionListener() {
             @Override
@@ -191,6 +190,7 @@ public class BankGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String tableName = BudgetDB.BILL_TABLE;
                 deleteSelection(tableName);
+                updateTable();
             }
         });
 
@@ -315,21 +315,23 @@ public class BankGUI extends JFrame {
         int currentRow;
         if (tableName.equals(BudgetDB.BILL_TABLE)) {
             currentRow = current_bills.getSelectedRow();
+            int ID = (int)billModel.getValueAt(currentRow, 0);
             if (currentRow == -1) {
                 errorDialog("Error: you have not selected a row");
 
             }else{
-                db.deleteFromDB(tableName, currentRow);
+                db.deleteFromDB(tableName, ID);
                 updateTable();
             }
 
         }
         if (tableName.equals(BudgetDB.TRANSACTION_TABLE)){
             currentRow = bankTable.getSelectedRow();
+            int ID = (int)bankModel.getValueAt(currentRow, 0);
             if (currentRow == -1){
                 errorDialog("You haven't selected a row");
             }else{
-                db.deleteFromDB(tableName,currentRow);
+                db.deleteFromDB(tableName, ID);
                 updateTable();
             }
         }
@@ -442,6 +444,9 @@ public class BankGUI extends JFrame {
 
         bankModel.resetData(bankData, bankColNames);
         billModel.resetData(billData, billColNames);
+
+        bankModel.fireTableDataChanged();
+        billModel.fireTableDataChanged();
 
         setDefaults();
 

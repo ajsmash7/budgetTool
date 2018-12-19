@@ -221,13 +221,13 @@ import java.util.Vector;
     //Delete from the passed table name, where ID equals the selected row in the table. variable arguments from BankGUI
      //deleteSeletion and pay_billButton action event
     public String deleteFromDB(String table, int ID) {
-        String deleteSQL = "DELETE FROM ? WHERE ? = ?";
+        String deleteSQL = "";
+        if (table.equals(BILL_TABLE)){deleteSQL = "DELETE FROM billsDue WHERE ID = ?";}
+        if (table.equals(TRANSACTION_TABLE)){deleteSQL = "DELETE FROM transactions WHERE ID = ?";}
         try (Connection conn = DriverManager.getConnection(db_url);
              PreparedStatement ps = conn.prepareStatement(deleteSQL)) {
 
-            ps.setString(1, table);
-            ps.setString(2, ID_COLUMN);
-            ps.setInt(3, ID);
+            ps.setInt(1, ID);
 
             ps.executeUpdate();
 

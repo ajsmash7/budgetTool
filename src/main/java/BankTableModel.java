@@ -118,7 +118,7 @@ public class BankTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName(int column) {
-        return super.getColumnName(column);
+        return dataColumnNames.get(column);
     }
 
     //Custom method that I created to behave as setDataVector() does for DefaultTableModel
@@ -127,7 +127,7 @@ public class BankTableModel extends AbstractTableModel {
     public void resetData(Vector<Bank> refreshData, Vector<String> columnNames) {
         setData(refreshData);
         setDataColumnNames(columnNames);
-        fireTableDataChanged();
+
 
     }
 
