@@ -250,9 +250,9 @@ import java.util.Vector;
         String updateSQL = " ";
         //choose the appropriate update statement, based on the class
         if (c == Bill.class) {
-             updateSQL = "UPDATE billsDue SET ?=? SET ?=? SET ?=? WHERE ?=?";
+             updateSQL = "UPDATE billsDue SET Bill_Name = ?, Bill_Amount = ?, Due_Date = ? WHERE ID = ?";
         }if (c == Expense.class || c == Credit.class) {
-                updateSQL = "UPDATE transactions SET ?=? SET ?=? SET ?=? SET ?=? WHERE ?=?";
+                updateSQL = "UPDATE transactions SET Description = ?, Amount = ?, PaidOn_Date = ?, Type = ? WHERE ID = ?";
             }
             //open the database connection in a try with resources
             try (Connection conn = DriverManager.getConnection(db_url)) {
@@ -263,14 +263,10 @@ import java.util.Vector;
                     //wrap the preparedStatement setters in if statements to assign based on class
                     if (c == Bill.class) {
 
-                        ps.setString(1, BILL_NAME_COLUMN);
-                        ps.setString(2, transaction.getName());
-                        ps.setString(3, BILL_AMT_COLUMN);
-                        ps.setDouble(4, transaction.getAmount());
-                        ps.setString(5, DUE_DATE_COLUMN);
-                        ps.setString(6, date);
-                        ps.setString(7, ID_COLUMN);
-                        ps.setInt(8, ID);
+                        ps.setString(1, transaction.getName());
+                        ps.setDouble(2, transaction.getAmount());
+                        ps.setString(3, date);
+                        ps.setInt(4, ID);
 
                         ps.executeUpdate();
 
@@ -278,16 +274,11 @@ import java.util.Vector;
                     }
                     if (c == Expense.class || c == Credit.class) {
 
-                        ps.setString(1, TRANS_DESC_COLUMN);
-                        ps.setString(2, transaction.getName());
-                        ps.setString(3, TRANS_AMT_COLUMN);
-                        ps.setDouble(4, transaction.getAmount());
-                        ps.setString(5, TRANS_PAID_COLUMN);
-                        ps.setString(6, date);
-                        ps.setString(7, TRANS_TYPE_COLUMN);
-                        ps.setString(8, transaction.getExpenseType());
-                        ps.setString(9, ID_COLUMN);
-                        ps.setInt(10, ID);
+                        ps.setString(1, transaction.getName());
+                        ps.setDouble(2, transaction.getAmount());
+                        ps.setString(3, date);
+                        ps.setString(4, transaction.getExpenseType());
+                        ps.setInt(4, ID);
 
                         ps.executeUpdate();
 

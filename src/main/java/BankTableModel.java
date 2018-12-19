@@ -59,6 +59,16 @@ public class BankTableModel extends AbstractTableModel {
     }
 
     @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        if(columnIndex > 0){
+            return true;
+
+        }else{
+            return false;
+        }
+    }
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
             return data.get(rowIndex).getID();
@@ -72,7 +82,7 @@ public class BankTableModel extends AbstractTableModel {
         if (columnIndex == 3) {
             return data.get(rowIndex).getDate();
         }
-        if (getColumnCount()==5 && columnIndex == 4) {
+        if (columnIndex == 4) {
                 return data.get(rowIndex).getExpenseType();
             }
         else{
@@ -88,28 +98,54 @@ public class BankTableModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
         try {
-
+            //get column count
+            int columnCount = getColumnCount();
+            System.out.println(columnCount);
+            //Get the original content for the row.
             int ID = (int) getValueAt(rowIndex, 0);
             String name = (String) getValueAt(rowIndex, 1);
-            double amt = (double) getValueAt(rowIndex, 2);
-            Date date = (Date) getValueAt(rowIndex, 3);
+            double amt = (double) getValueAt(rowIndex,2);
+            Date date = (Date) getValueAt(rowIndex,3);
+            String expense = (String) getValueAt(rowIndex, 4);
 
-            if (getColumnCount() == 5) {
-                String expense = (String) getValueAt(rowIndex, 4);
-                if (expense.equals("Deposit")) {
+
+            //based on which editable row was changed, reassign the changed value to the appropriate variable
+            switch(columnIndex){
+                case 0:
+                    System.out.println("cannot edit this column");
+                    break;
+                case 1:
+                    name = aValue.toString();
+                    break;
+                case 2:
+                    amt = Double.parseDouble(aValue.toString());
+                    break;
+                case 3:
+                    date = (Date) aValue;
+                    break;
+                case 4:
+                    expense = aValue.toString();
+                    break;
+            }
+
+            if (columnCount == 5 && expense.equals("Deposit")) {
                     Credit editCredit = new Credit(ID, name, amt, date, expense);
                     BudgetDB.updateDB(editCredit, ID);
-                } else {
-                    Expense editExpense = new Expense(ID, name, amt, date, expense);
+                }
+
+            if (columnCount == 5 && expense != "Deposit"){
+                Expense editExpense = new Expense(ID, name, amt, date, expense);
                     BudgetDB.updateDB(editExpense, ID);
                 }
-            }
-            if (getColumnCount() == 4) {
+
+            if (columnCount == 4) {
                 Bill editBill = new Bill(ID, name, amt, date);
                 BudgetDB.updateDB(editBill, ID);
-            } else {
+            }
+            else {
                 System.out.println("ERROR in column count, current count: " + getColumnCount());
             }
+
         } catch (NumberFormatException n){
             System.out.println("Cell entry is invalid");
             throw new RuntimeException(n);

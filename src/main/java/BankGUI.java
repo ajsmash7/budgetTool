@@ -1,9 +1,8 @@
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -140,29 +139,61 @@ public class BankGUI extends JFrame {
             }
         });
         //table listener for current bills cell edits. setValueAt talks to the database to update with the changes
-        // updateTable method calls a fireTableDataChanged to refresh table
-        //current_bills.getModel().addTableModelListener(new TableModelListener() {
-          //  @Override
-            //public void tableChanged(TableModelEvent e) {
-              //  int row = current_bills.getSelectedRow();
-                //int column = current_bills.getSelectedColumn();
-                //Object a = current_bills.getValueAt(row,column);
-                //current_bills.setValueAt(a, row, column);
-                //updateTable();
-           // }
-        //});
+         //updateTable method calls a fireTableDataChanged to refresh table
+        current_bills.getModel().addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                int row = current_bills.getSelectedRow();
+                int column = current_bills.getSelectedColumn();
+                Object a = current_bills.getValueAt(row,column);
+                current_bills.setValueAt(a, row, column);
+                billModel.fireTableCellUpdated(row, column);
+                calculateFunds();
+
+           }
+        });
         //listener for the transaction table. setValue at calls the database to update the correct table with the changes
         //updateTable refreshes the gui and table.
-        //bankTable.getModel().addTableModelListener(new TableModelListener() {
-            //@Override
-            //public void tableChanged(TableModelEvent e) {
-                //int column = bankTable.getSelectedColumn();
-                //int row = bankTable.getSelectedRow();
-                //Object a = bankTable.getValueAt(row, column);
-                //bankTable.setValueAt(a, row, column);
-               // updateTable();
-            //}
-        //});
+        bankTable.getModel().addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                int column = bankTable.getSelectedColumn();
+                int row = bankTable.getSelectedRow();
+                Object a = bankTable.getValueAt(row, column);
+                bankTable.setValueAt(a, row, column);
+                bankModel.fireTableCellUpdated(row,column);
+                calculateFunds();
+
+            }
+        });
+
+        date_field.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                date_field.setText("");
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                date_field.setText("");
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
         //bill pay button. when pressed it adds the selected bill to the transaction table, and deletes it from the billtable.
         pay_now.addActionListener(new ActionListener() {
             @Override
@@ -342,13 +373,16 @@ public class BankGUI extends JFrame {
     //method to calculate the total funds available, and total funds once all bills are paid.
     //call the database methods to add up the totals for both the bill table and the after bill pay table.
     public void calculateFunds(){
-        String totalCash = String.valueOf(db.bankTotal());
+        double totalCash = db.bankTotal();
+        String formattedCash = String.format("$%10.2f",totalCash);
 
-        available_cash.setText(totalCash);
+        available_cash.setText(formattedCash);
 
-        String totalBills = String.valueOf(db.billTotal());
+        double totalBills = db.bankTotal()-db.billTotal();
 
-        after_billpay.setText(totalBills);
+        String formattedBills = String.format("$%10.2f",totalBills);
+
+        after_billpay.setText(formattedBills);
 
     }
     //method to populate when your next bill is due, what the name of it is, and how much. set gui labels
