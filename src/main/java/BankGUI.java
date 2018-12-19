@@ -110,7 +110,7 @@ public class BankGUI extends JFrame {
                         type_name.setText("Deposit Description:");
                         amount.setText("Amount Deposited:");
                         label_date.setText("Deposited On:");
-                        date_field.setText(getCurrentDate());
+                        date_field.setText(getCurrentDateString());
                         break;
                     case "Expense":
                         type_label.setVisible(true);
@@ -157,10 +157,10 @@ public class BankGUI extends JFrame {
         bankTable.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                int column = bankTable.getSelectedColumn();
-                int row = bankTable.getSelectedRow();
-                Object a = bankTable.getValueAt(row, column);
-                bankTable.setValueAt(a, row, column);
+                //int column = bankTable.getSelectedColumn();
+                //int row = bankTable.getSelectedRow();
+                //Object a = bankTable.getValueAt(row, column);
+                //bankTable.setValueAt(a, row, column);
                 updateTable();
             }
         });
@@ -223,7 +223,7 @@ public class BankGUI extends JFrame {
     public void validateData(String selection){
         String name = "";
         double amt = 0.0;
-        Date date = (convertDate(getCurrentDate()));
+        Date date = getDateNow();
         String expenseType = "";
         try {
             if (desc_name.getText().isEmpty() || desc_name.getText().equals("")) {
@@ -357,33 +357,40 @@ public class BankGUI extends JFrame {
 
         for(Bill bill: nextBill){
             bill_due_name.setText(bill.getName() + bill.getAmount());
-            next_bill_date.setText(bill.getDate().toString());
+            next_bill_date.setText(convertDateToString(bill.getDate()));
 
         }
 
     }
     //date formatter to return a formatted String of the current date
-    private static String getCurrentDate(){
+    private static String getCurrentDateString(){
 
 
-            java.util.Date date = new java.util.Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String currentDate = dateFormat.format(date);
 
             return currentDate;
+    }
+
+    private static String convertDateToString(Date date) {
 
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(date);
 
+        return currentDate;
     }
     //date formatter to get the current date in the java.util.Date datatype.
     private Date getDateNow(){
 
         try {
-            SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
             String dateString = format.format(new Date());
             Date date = format.parse(dateString);
             return date;
+
         }catch (ParseException d){
             errorDialog("Can't parse date");
             throw new RuntimeException(d);
@@ -392,13 +399,14 @@ public class BankGUI extends JFrame {
 
     }
     //another date converter but to take a legacy date and convert it to a java.util.Date.
-    private java.util.Date convertDate(String date){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+    private Date convertDate(String date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            java.util.Date parsedDate = dateFormat.parse(date);
+            Date parsedDate = dateFormat.parse(date);
 
 
             return parsedDate;
+
         } catch (ParseException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

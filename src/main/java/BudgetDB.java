@@ -7,6 +7,8 @@
  */
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
@@ -28,20 +30,20 @@ import java.util.Vector;
     private static final String DUE_DATE_COLUMN = "Due_Date";
     private static final String TRANS_DESC_COLUMN = "Description";
     private static final String TRANS_AMT_COLUMN = "Amount";
-    private static final String TRANS_TYPE_COLUMN = "Type";
     private static final String TRANS_PAID_COLUMN = "PaidOn_Date";
+    private static final String TRANS_TYPE_COLUMN = "Type";
     static final String OK = "OK";
 
 
     //Create Table SQL strings
     private static final String CREATE_BILL_TABLE = "CREATE TABLE IF NOT EXISTS billsDue(ID INTEGER PRIMARY KEY , Bill_Name TEXT, Bill_Amount DECIMAL(10,2), Due_Date TEXT)";
-    private static final String CREATE_TRANSACTION_TABLE = "CREATE TABLE IF NOT EXISTS transactions(ID INTEGER PRIMARY KEY, Description TEXT, Amount DECIMAL(10,2), Type TEXT, PaidOn_Date TEXT)";
+    private static final String CREATE_TRANSACTION_TABLE = "CREATE TABLE IF NOT EXISTS transactions(ID INTEGER PRIMARY KEY, Description TEXT, Amount DECIMAL(10,2), PaidOn_Date TEXT, Type TEXT)";
 
     //SQL Strings for Statements
     private static final String GET_ALL_TRANSACTIONS = "SELECT * FROM transactions";
     private static final String GET_ALL_BILLS = "SELECT * FROM billsDue";
-    private static final String ADD_EXPENSE = "INSERT INTO transactions (?,?,?,?) VALUES (?,?,?,?)";
-    private static final String ADD_BILL = "INSERT INTO billsDue (?,?,?) VALUES (?,?,?)";
+    private static final String ADD_EXPENSE = "INSERT INTO transactions (Description, Amount, PaidOn_Date, Type) VALUES (?,?,?,?)";
+    private static final String ADD_BILL = "INSERT INTO billsDue (Bill_Name, Bill_Amount, Due_Date) VALUES (?,?,?)";
 
 
     BudgetDB(){createTables();} //call the constructor to create the instance of the database.
@@ -81,8 +83,8 @@ import java.util.Vector;
                 columnNames.add("ID");
                 columnNames.add("Description");
                 columnNames.add("Amount");
-                columnNames.add("Type");
                 columnNames.add("PaidOn_Date");
+                columnNames.add("Type");
                 break;
             default:
                 System.out.println("I'm throwing an error, table name incorrect"); //throw an error if table name doesn't match
@@ -114,10 +116,9 @@ import java.util.Vector;
                         int ID = bills.getInt(ID_COLUMN);
                         String name = bills.getString(BILL_NAME_COLUMN);
                         double amt = bills.getDouble(BILL_AMT_COLUMN);
+                        String date = bills.getString(DUE_DATE_COLUMN);
 
-                        java.sql.Date date = bills.getDate(DUE_DATE_COLUMN);
-
-                        java.util.Date addDate= convertSQLDate(date);
+                        Date addDate= convertSQLDate(date);
 
                         Bill row = new Bill(ID, name, amt, addDate);
 
@@ -131,9 +132,9 @@ import java.util.Vector;
                         String name = rs.getString(TRANS_DESC_COLUMN);
                         double amt = rs.getDouble(TRANS_AMT_COLUMN);
                         String type = rs.getString (TRANS_TYPE_COLUMN);
-                        java.sql.Date date = rs.getDate(TRANS_PAID_COLUMN);
+                        String date = rs.getString(TRANS_PAID_COLUMN);
 
-                        java.util.Date addDate = convertSQLDate(date);
+                        Date addDate = convertSQLDate(date);
 
                         Expense row = new Expense(ID, name, amt,addDate,type);
 
@@ -159,26 +160,26 @@ import java.util.Vector;
     They accept a generic Bank Object called transaction that uses a class wildcard to dynamically update database
     values based on class assignment.
 
-    I'M CURRENTLY UNABLE TO GET THE DATES TO PARSE CORRECTLY
+
      */
     public String addTransToDB(Bank transaction){
         Class <? extends Bank> c = transaction.getClass();
-        if (c == Bill.class || c == Expense.class){
-            double negAmt = transaction.getNegAmt(transaction.getAmount());
-            transaction.setNegAmt(negAmt);
 
-        }
+
+
         try (Connection conn = DriverManager.getConnection(db_url);
              PreparedStatement ps = conn.prepareStatement(ADD_EXPENSE)){
 
-            ps.setString(1, TRANS_DESC_COLUMN);
-            ps.setString(2, TRANS_AMT_COLUMN);
-            ps.setString(3, TRANS_PAID_COLUMN);
-            ps.setString(4, TRANS_TYPE_COLUMN);
-            ps.setString(5, transaction.getName());
-            ps.setDouble(6, transaction.getAmount());
-            ps.setDate(7, new java.sql.Date(transaction.getDate().getTime())); //attempting to parse into sqlDate
-            ps.setString(8, transaction.getExpenseType());
+            if (c == Bill.class || c == Expense.class){
+                double negAmt = transaction.getNegAmt(transaction.getAmount());
+                transaction.setNegAmt(negAmt);}
+
+            String date = convertDateToString(transaction.getDate());
+
+            ps.setString(1, transaction.getName());
+            ps.setDouble(2, transaction.getAmount());
+            ps.setString(3, date);
+            ps.setString(4, transaction.getExpenseType());
 
             ps.executeUpdate();
 
@@ -196,13 +197,14 @@ import java.util.Vector;
         try (Connection connection = DriverManager.getConnection(db_url);
              PreparedStatement p = connection.prepareStatement(ADD_BILL)){
 
+            String date = convertDateToString(bill.getDate());
+
             //add name, amt, and date from Bill object to bill date
-            p.setString(1, BILL_NAME_COLUMN);
-            p.setString(2, BILL_AMT_COLUMN);
-            p.setString(3, DUE_DATE_COLUMN);
-            p.setString(4, bill.getName());
-            p.setDouble(5, bill.getAmount());
-            p.setDate(6, new java.sql.Date(bill.getDate().getTime()));
+
+            p.setString(1, bill.getName());
+            p.setDouble(2, bill.getAmount());
+
+            p.setString(3, date);
 
             p.executeUpdate();
 
@@ -219,7 +221,7 @@ import java.util.Vector;
     //Delete from the passed table name, where ID equals the selected row in the table. variable arguments from BankGUI
      //deleteSeletion and pay_billButton action event
     public String deleteFromDB(String table, int ID) {
-        String deleteSQL = "DELETE FROM ? WHERE ?=?";
+        String deleteSQL = "DELETE FROM ? WHERE ? = ?";
         try (Connection conn = DriverManager.getConnection(db_url);
              PreparedStatement ps = conn.prepareStatement(deleteSQL)) {
 
@@ -241,7 +243,7 @@ import java.util.Vector;
         //this method is called by the setValueAt method in the BanktableModel class, from the table listener event.
         // When a cell is updated, the table listener fires, and calls the setValueAt method in the model.
         // which calls this method to update the row in which the changes were made. The table is selected based on
-        //the class of the Bank object. Nill updates the bill table, expense and credits update the transaction table.
+        //the class of the Bank object. Bill updates the bill table, expense and credits update the transaction table.
         public static String updateDB(Bank transaction, int ID){
 
         Class<? extends Bank> c = transaction.getClass();
@@ -256,6 +258,8 @@ import java.util.Vector;
             try (Connection conn = DriverManager.getConnection(db_url)) {
                 try (PreparedStatement ps = conn.prepareStatement(updateSQL)) {
 
+                    String date = convertDateToString(transaction.getDate());
+
                     //wrap the preparedStatement setters in if statements to assign based on class
                     if (c == Bill.class) {
 
@@ -264,7 +268,7 @@ import java.util.Vector;
                         ps.setString(3, BILL_AMT_COLUMN);
                         ps.setDouble(4, transaction.getAmount());
                         ps.setString(5, DUE_DATE_COLUMN);
-                        ps.setDate(6, new java.sql.Date(transaction.getDate().getTime()));
+                        ps.setString(6, date);
                         ps.setString(7, ID_COLUMN);
                         ps.setInt(8, ID);
 
@@ -279,7 +283,7 @@ import java.util.Vector;
                         ps.setString(3, TRANS_AMT_COLUMN);
                         ps.setDouble(4, transaction.getAmount());
                         ps.setString(5, TRANS_PAID_COLUMN);
-                        ps.setDate(6, new java.sql.Date(transaction.getDate().getTime()));
+                        ps.setString(6, date);
                         ps.setString(7, TRANS_TYPE_COLUMN);
                         ps.setString(8, transaction.getExpenseType());
                         ps.setString(9, ID_COLUMN);
@@ -364,7 +368,7 @@ import java.util.Vector;
             ResultSet rs = ps.executeQuery();
             int ID = rs.getInt(ID_COLUMN);
             String name = rs.getString(BILL_NAME_COLUMN);
-            java.sql.Date date = rs.getDate(DUE_DATE_COLUMN);
+            String date= rs.getString(DUE_DATE_COLUMN);
             double amt = rs.getDouble(BILL_AMT_COLUMN);
 
             java.util.Date addDate = convertSQLDate(date);
@@ -389,17 +393,26 @@ import java.util.Vector;
 
     //custom method to convert date from java.util.Date to java.sql.Date. Doesn't work or vis a versa.
 
-     public static java.util.Date convertSQLDate(
-             java.sql.Date sqlDate) {
-         java.util.Date javaDate = null;
-         if (sqlDate != null) {
-             javaDate = new Date(sqlDate.getTime());
+     public static Date convertSQLDate(String dateString) {
+         try {
+             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+             Date parsedDate = format.parse(dateString);
+             String str = String.format("%1$tY-%1$tm-%1$td", parsedDate);
+             Date date = format.parse(str);
+
+             return date;
+         } catch (ParseException d) {
+             System.out.println("Cannot parse date");
+             throw new RuntimeException(d);
          }
-         return javaDate;
      }
 
+     public static String convertDateToString(Date date){
+         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+         String currentDate = dateFormat.format(date);
 
-
-
+         return currentDate;
+     }
 
 }

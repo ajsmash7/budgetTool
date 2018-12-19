@@ -72,11 +72,10 @@ public class BankTableModel extends AbstractTableModel {
         if (columnIndex == 3) {
             return data.get(rowIndex).getDate();
         }
-        if (columnIndex == 4) {
-            return data.get(rowIndex).getExpenseType();
-
-
-        }else{
+        if (getColumnCount()==5 && columnIndex == 4) {
+                return data.get(rowIndex).getExpenseType();
+            }
+        else{
             return "Could not find";
         }
     }
